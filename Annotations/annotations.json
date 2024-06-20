@@ -1,18 +1,74 @@
 [
   {
     "Page": 0,
-    "Name": "notice_market_value",
-    "X": 412.799,
-    "Y": 320.29,
+    "Name": "notice_improvement_value",
+    "X": 97.4211,
+    "Y": 305.86996,
+    "Height": 22.0,
+    "Width": 149.99991
+  },
+  {
+    "Page": 0,
+    "Name": "notice_land_value",
+    "X": 96.8955,
+    "Y": 365.25696,
+    "Height": 22.0,
+    "Width": 150.00049
+  },
+  {
+    "Page": 0,
+    "Name": "notice_improvement_value_hs",
+    "X": 97.0491,
+    "Y": 336.12497,
+    "Height": 22.0,
+    "Width": 149.9999
+  },
+  {
+    "Page": 0,
+    "Name": "notice_total_notice_value",
+    "X": 94.7934,
+    "Y": 427.27197,
+    "Height": 22.0,
+    "Width": 149.9996
+  },
+  {
+    "Page": 0,
+    "Name": "current_improvement_value",
+    "X": 360.721,
+    "Y": 306.39496,
     "Height": 22.0,
     "Width": 150.0
   },
   {
     "Page": 0,
-    "Name": "scheduling_hearing_date",
-    "X": 357.817,
-    "Y": 396.217,
+    "Name": "current_improvement_value_hs",
+    "X": 361.247,
+    "Y": 337.40298,
     "Height": 22.0,
-    "Width": 206.29099
+    "Width": 150.0
+  },
+  {
+    "Page": 0,
+    "Name": "current_land_value",
+    "X": 364.4,
+    "Y": 366.30798,
+    "Height": 22.0,
+    "Width": 150.00003
+  },
+  {
+    "Page": 0,
+    "Name": "currentl_land_value_hs",
+    "X": 363.875,
+    "Y": 398.36597,
+    "Height": 22.0,
+    "Width": 150.0
+  },
+  {
+    "Page": 0,
+    "Name": "total_agreed_value",
+    "X": 361.247,
+    "Y": 429.37396,
+    "Height": 22.0,
+    "Width": 150.0
   }
 ]

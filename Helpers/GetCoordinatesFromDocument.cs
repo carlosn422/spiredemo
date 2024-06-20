@@ -53,7 +53,6 @@ namespace SpireSearchPDFCoordinates
                                     Y = ((Spire.Pdf.Widget.PdfStyledFieldWidget)field).Bounds.Y,
                                     Width = ((Spire.Pdf.Widget.PdfStyledFieldWidget)field).Bounds.Width,
                                     Height = ((Spire.Pdf.Widget.PdfStyledFieldWidget)field).Bounds.Height,
-
                                 };
 
                                 formFields.Add(fieldObj);

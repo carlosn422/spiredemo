@@ -12,6 +12,11 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Reflection.Metadata;
 using SpireSearchPDFCoordinates;
 using Newtonsoft.Json;
+using Spire.Pdf.Graphics;
+using System.Reflection.PortableExecutable;
+using Image = System.Drawing.Image;
+using PdfDocument = Spire.Pdf.PdfDocument;
+using SpireSearchPDFCoordinates.Helpers;
 
 namespace SearchPDFCoordinates
 {
@@ -46,7 +51,7 @@ namespace SearchPDFCoordinates
 
             #endregion
         }
-        private static void ExtractTextFromRegion(List<Annotation_Spire> deserializedAnnotations, FileStream reader)
+        private static async Task ExtractTextFromRegion(List<Annotation_Spire> deserializedAnnotations, FileStream reader)
         {
             using (Spire.Pdf.PdfDocument doc = new Spire.Pdf.PdfDocument())
             {
@@ -71,11 +76,11 @@ namespace SearchPDFCoordinates
                 //var isScanned = false; // uncomment this to skip over the AddRectangleToMemoryStream
                 var isScanned = textLayerCount < 10;
 
-                PdfDocument modifiedDocument = new Spire.Pdf.PdfDocument();
-                if (isScanned)
-                {
-                    modifiedDocument = AddRectangleToMemoryStream(doc, deserializedAnnotations);
-                }
+                //PdfDocument modifiedDocument = new Spire.Pdf.PdfDocument();
+                //if (isScanned)
+                //{
+                //    modifiedDocument = AddRectangleToMemoryStream(doc, deserializedAnnotations);
+                //}
 
                 List<string> output = new List<string>();
                 foreach (Annotation_Spire annot in deserializedAnnotations)
@@ -83,17 +88,63 @@ namespace SearchPDFCoordinates
                     #region original implementation
 
                     Spire.Pdf.PdfPageBase currentPage = doc.Pages[annot.Page];
-                    if (isScanned)
-                    {
-                        currentPage = modifiedDocument.Pages[annot.Page];
-                    }
+                    //currentPage.Rotation = PdfPageRotateAngle.RotateAngle0;
+                    
+                    //if (isScanned)
+                    //{
+                    //    currentPage = modifiedDocument.Pages[annot.Page];
+                    //}
 
                     Spire.Pdf.Texts.PdfTextExtractor textExtractor = new Spire.Pdf.Texts.PdfTextExtractor(currentPage);
                     PdfTextExtractOptions extractOptions = new PdfTextExtractOptions();
                     extractOptions.ExtractArea =
                         new RectangleF(annot.X, annot.Y, annot.Width, annot.Height);
                     string text = textExtractor.ExtractText(extractOptions);
+                   
+                    #endregion
+
+
+                    // Convert the region to an image and send to azure AI to fetch the content
+                    if (string.IsNullOrEmpty(text))
+                    {
+                        RegionToImage regionToImage = new RegionToImage();
+                        MemoryStream imageStream = regionToImage.FetchImageFromRectangle(doc,annot);
+
+                        // Get response from azure AI
+                        AzureVisionAI azureVisionAI = new AzureVisionAI();
+                        text = await azureVisionAI.RunProcess(imageStream);
+                    }
+
                     Console.WriteLine(text);
+
+                    #region get an image of the region
+
+                    //// Create a single image from a pdf document
+                    //Image image = doc.SaveAsImage(0, PdfImageType.Bitmap, (int)currentPage.ActualSize.Width, (int)currentPage.ActualSize.Height);
+                    //image.Save(@"C:\Users\carlo\source\repos\SpireSearchPDFCoordinates\Documents\El Paso\cropped_image.svg");
+
+
+                    //// Crop the region and add to the new document
+                    //PdfPageBase croppedPage = currentPage.Document.Pages.Add(currentPage.Size, new PdfMargins(0));
+                    //currentPage.CreateTemplate().Draw(croppedPage, new RectangleF(annot.X, annot.Y, annot.Width, annot.Height));
+                    //currentPage.Document.Save(@"C:\Users\carlo\source\repos\SpireSearchPDFCoordinates\Documents\El Paso\cropped_image.svg", FileFormat.SVG);
+
+
+                    ////RectangleF rect = new RectangleF(annot.X, annot.Y, annot.Width, annot.Height);
+                    ////Bitmap bitmap = new Bitmap((int)annot.Width, (int)annot.Height);
+
+                    ////using (Graphics graphics = Graphics.FromImage(bitmap))
+                    ////{
+                    ////    graphics.Clear(Color.White); 
+                    ////    currentPage.CreateTemplate().Draw(currentPage, rect);
+                    ////    bitmap.Save(@"C:\Users\carlo\Downloads\output_image.png", System.Drawing.Imaging.ImageFormat.Png);
+                    ////    bitmap.Dispose();
+                    ////}
+
+                    ////currentPage.ExtractImages();
+                    ////System.Drawing.Image image = currentPage.ConvertToImage(new RectangleF(annot.X, annot.Y, annot.Width, annot.Height));
+                    ////image.Save($"captured_region_page_{annot.Page}.png", System.Drawing.Imaging.ImageFormat.Png);
+                    ////image.Dispose(); 
 
                     #endregion
                 }
@@ -111,26 +162,22 @@ namespace SearchPDFCoordinates
 
                 foreach (Annotation_Spire annotation in deserializedAnnotations)
                 {
-                    //PdfPageBase page = doc.Pages.Add();
-                    Func<float, float, float, float> MapCoordinates = (float sourceX, float sourceY, float sourceHeight) =>
-                    {
-                        float targetX = sourceX; 
-                        float targetY = doc.Pages[annotation.Page].Size.Height - sourceY - sourceHeight; 
-                        return targetY;
-                    };
-
+                   
                     float targetX = annotation.X;
-                    float targetY = MapCoordinates(annotation.X, annotation.Y, annotation.Height);
+                    float targetY = annotation.Y;
                     float targetWidth = annotation.Width;
                     float targetHeight = annotation.Height;
 
 
                     PdfPageBase page = doc.Pages[annotation.Page];
+                    //page.Rotation = PdfPageRotateAngle.RotateAngle90;
                     PdfTextBoxField textbox = new PdfTextBoxField(page, annotation.Name);
                     textbox.Bounds = new RectangleF(targetX, targetY, targetWidth, targetHeight);
                     textbox.BorderWidth = 0.75f;
                     textbox.BorderStyle = PdfBorderStyle.Solid;
                     doc.Form.Fields.Add(textbox);
+
+
                 }
 
 
@@ -161,6 +208,6 @@ namespace SearchPDFCoordinates
             }
         }
 
-       
+
     }
 }
