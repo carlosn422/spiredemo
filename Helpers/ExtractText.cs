@@ -20,13 +20,14 @@ using SpireSearchPDFCoordinates.Helpers;
 
 namespace SearchPDFCoordinates
 {
-    public static class TextExtractor
+    public class TextExtractor
     {
         static string rootDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName;
         static string inputCoordinatesFile = System.IO.Path.Combine(rootDirectory, "Annotations", "annotations.json");
         
-        public static void ReadDocValuesUsingSpire(string documentPath)
+        public async Task ReadDocValuesUsingSpire(string documentPath)
         {
+            //Spire.Pdf.License.LicenseProvider.SetLicenseKey("License/license.elic.xml");
             #region get the field values from coordinates
 
             // Read the JSON content from the file
@@ -40,7 +41,7 @@ namespace SearchPDFCoordinates
             {
                 if (fileStream.CanRead)
                 {
-                    TextExtractor.ExtractTextFromRegion(deserializedAnnotations, fileStream);
+                    await TextExtractor.ExtractTextFromRegion(deserializedAnnotations, fileStream);
                 }
                 else
                 {
@@ -105,17 +106,17 @@ namespace SearchPDFCoordinates
 
 
                     // Convert the region to an image and send to azure AI to fetch the content
-                    if (string.IsNullOrEmpty(text))
-                    {
+                    //if (string.IsNullOrEmpty(text))
+                    //{
                         RegionToImage regionToImage = new RegionToImage();
-                        MemoryStream imageStream = regionToImage.FetchImageFromRectangle(doc,annot);
+                        Bitmap bitmap = regionToImage.FetchImageFromRectangle(doc,annot);
 
                         // Get response from azure AI
                         AzureVisionAI azureVisionAI = new AzureVisionAI();
-                        text = await azureVisionAI.RunProcess(imageStream);
-                    }
+                        text = await azureVisionAI.RunProcess(bitmap);
+                    //}
 
-                    Console.WriteLine(text);
+                    Console.WriteLine("Field: {0} | Value:{1}", annot.Name, text);
 
                     #region get an image of the region
 

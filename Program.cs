@@ -1,13 +1,9 @@
 ﻿using SearchPDFCoordinates;
-using SpireSearchPDFCoordinates.Helpers;
 
 namespace SpireSearchPDFCoordinates
 {
     using System;
-    using System.Drawing.Imaging;
-    using System.Drawing;
     using System.IO;
-    using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 
     /// <summary>
     /// The purpose of the app, is to read the getCoordinatesFromDocumentPath, create the annotations.json file
@@ -21,11 +17,13 @@ namespace SpireSearchPDFCoordinates
 
     class Program
     {
+        
+
         static string rootDirectory = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName;
 
         //Not Working Documents - These documents are working properly
         static string getCoordinatesFromDocumentPath = Path.Combine(rootDirectory, "Documents", "Aransas_template.pdf");
-        static string getTextFromDocumentPath = Path.Combine(rootDirectory, "Documents", "Aransas - Copy.pdf");
+        static string getTextFromDocumentPath = Path.Combine(rootDirectory, "Documents/Craigs_Initial_Sample", "Aransas.pdf");
 
         //Working Documents - These documents are working properly
         //static string getCoordinatesFromDocumentPath = Path.Combine(rootDirectory, "Documents/Working", "R163775_WD_Template.pdf");
@@ -51,20 +49,27 @@ namespace SpireSearchPDFCoordinates
         static async Task Main(string[] args)
         {
 
-           
+            //Applying the license causes issues reading the files.
+            //Spire.Pdf.License.LicenseProvider.SetLicenseKey("License/license.elic.xml");
+
+
             /*
              * Get the coordinates from the file and write them to the coordinates json file.
              * This is later used to fetch the content from the file
              */
+
             GetCoordinatesFromDocument.UsingSpireExtractAnnotationsCoordinates(getCoordinatesFromDocumentPath);
 
             /*
              * Fetch the text using the coordinates.json file
              */
-            TextExtractor.ReadDocValuesUsingSpire(getTextFromDocumentPath);
 
-            #region read image
-            //Spire.Pdf.PdfDocument pdf = new Spire.Pdf.PdfDocument();
+            TextExtractor extractor = new TextExtractor();
+            await extractor.ReadDocValuesUsingSpire(getTextFromDocumentPath);
+
+
+
+            #region test code
 
             //pdf.LoadFromFile(getCoordinatesFromDocumentPath);
 
@@ -89,134 +94,24 @@ namespace SpireSearchPDFCoordinates
 
             //        using (Graphics graphics = Graphics.FromImage(bitmap))
             //        {
-            //            //RectangleF rect = new RectangleF(coordinates[0].X, coordinates[0].Y, coordinates[0].Width, coordinates[0].Height);
-            //            //using (Pen pen = new Pen(Color.Red, 2))
-            //            //{
-            //            //    graphics.DrawRectangle(pen, rect.X, rect.Y, rect.Width, rect.Height);
-            //            //}
-
-            //            //graphics.DrawImage(image, new Rectangle((int)coordinates[0].X, (int)coordinates[0].Y, (int)coordinates[0].Width / 2, (int)coordinates[0].Height), 
-            //            //                          new Rectangle((int)(coordinates[0].X * 2), (int)coordinates[0].Y, (int)coordinates[0].Width / 2, (int)coordinates[0].Height), GraphicsUnit.Pixel);
-
-            //            //Rectangle destRect = new Rectangle((int)412.799, (int)320.29, (int)coordinates[0].Width, (int)coordinates[0].Height);
-            //            //Rectangle sourceRect = new Rectangle((int)412.799, (int)320.29, (int)coordinates[0].Width, (int)coordinates[0].Height);
-
             //            Rectangle rect = new Rectangle((int)97.4211, (int)305.86996, (int)coordinates[0].Width, (int)coordinates[0].Height);
-
-
-            //            //Rectangle destRect = new Rectangle(0, 50, image.Width / 2, 500); // Adjust width as needed
-            //            //Rectangle sourceRect = new Rectangle(100, 50, image.Width / 2, 500);
-
             //            graphics.DrawImage(image, rect, rect, GraphicsUnit.Point);
-
-
-
-            //            //graphics.DrawImage(image, rect, rect, GraphicsUnit.Pixel);
 
             //            bitmap.Save(@"C:\Users\carlo\source\repos\SpireSearchPDFCoordinates\Documents\DocumentImages\" + String.Format("CropedPNG-img-{0}.png", i), ImageFormat.Png);
 
+            //            // Get response from azure AI
+            //            AzureVisionAI azureVisionAI = new AzureVisionAI();
+            //            await azureVisionAI.RunProcessUsingFilePath(@"C:\Users\carlo\source\repos\SpireSearchPDFCoordinates\Documents\DocumentImages\CropedPNG-img-" + i + ".png");
+
             //        }
 
-                    
+
 
             //    }
 
-            //}
+                #endregion
 
-
-            //// Get response from azure AI
-            //AzureVisionAI azureVisionAI = new AzureVisionAI();
-            //await azureVisionAI.RunProcess();
-            #endregion
-
-            // Using GemBox
-            //ComponentInfo.SetLicense("FREE-LIMITED-KEY");
-
-            // Read content
-            //using (var document = PdfDocument.Load(getCoordinatesFromDocumentPath))
-            //{
-            
-            #region read text
-            //var page = document.Pages[0];
-            //var text = page.Content.GetText(new PdfTextOptions
-            //{
-            //    Bounds = new PdfQuad(140, 640, 250, 660),
-            //    Order = PdfTextOrder.Reading
-            //}).ToString();
-
-            //Console.WriteLine($"Result: {text}");
-            #endregion
-
-            //foreach (var page in document.Pages)
-            //{
-            //    var contentEnumerator = page.Content.Elements.All(page.Transform).GetEnumerator();
-            //    while (contentEnumerator.MoveNext())
-            //    {
-            //        if (contentEnumerator.Current.ElementType == PdfContentElementType.Text)
-            //        {
-            //            var textElement = (PdfTextContent)contentEnumerator.Current;
-
-            //            var text = textElement.ToString();
-            //            var font = textElement.Format.Text.Font;
-            //            var color = textElement.Format.Fill.Color;
-            //            var bounds = textElement.Bounds;
-
-            //            contentEnumerator.Transform.Transform(ref bounds);
-
-            //            // Read the text content element's additional information.
-            //            Console.WriteLine($"Unicode text: {text}");
-            //            Console.WriteLine($"Font name: {font.Face.Family.Name}");
-            //            Console.WriteLine($"Font size: {font.Size}");
-            //            Console.WriteLine($"Font style: {font.Face.Style}");
-            //            Console.WriteLine($"Font weight: {font.Face.Weight}");
-
-            //            if (color.TryGetRgb(out double red, out double green, out double blue))
-            //                Console.WriteLine($"Color: Red={red}, Green={green}, Blue={blue}");
-
-            //            Console.WriteLine($"Bounds: Left={bounds.Left:0.00}, Bottom={bounds.Bottom:0.00}, Right={bounds.Right:0.00}, Top={bounds.Top:0.00}");
-            //            Console.WriteLine();
-            //        }
-
-            //        if (contentEnumerator.Current.ElementType == PdfContentElementType.Form)
-            //        {
-            //            var textElement = (PdfFormContent)contentEnumerator.Current;
-
-            //            var text = textElement.ToString();
-            //            var bounds = textElement.Bounds;
-
-            //            contentEnumerator.Transform.Transform(ref bounds);
-
-            //            // Read the text content element's additional information.
-            //            Console.WriteLine($"Unicode text: {text}");
-
-            //            Console.WriteLine($"Bounds: Left={bounds.Left:0.00}, Bottom={bounds.Bottom:0.00}, Right={bounds.Right:0.00}, Top={bounds.Top:0.00}");
-            //            Console.WriteLine();
-            //        } 
-
-            //        if (contentEnumerator.Current.ElementType == PdfContentElementType.Path)
-            //        {
-            //            var textElement = (PdfPathContent)contentEnumerator.Current;
-
-            //            var text = textElement.ToString();
-            //            var bounds = textElement.Bounds;
-
-            //            contentEnumerator.Transform.Transform(ref bounds);
-
-            //            // Read the text content element's additional information.
-            //            Console.WriteLine($"Unicode text: {text}");
-
-            //            Console.WriteLine($"Bounds: Left={bounds.Left:0.00}, Bottom={bounds.Bottom:0.00}, Right={bounds.Right:0.00}, Top={bounds.Top:0.00}");
-            //            Console.WriteLine();
-            //        }
-            //    }
-            //}
-
-
-            //}
-
+            }
 
         }
-
-
-    }
 }

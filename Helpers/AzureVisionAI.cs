@@ -2,9 +2,10 @@
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 using Newtonsoft.Json;
 using System.Drawing;
-using System.Net;
-using System.Reflection.Metadata.Ecma335;
+using System.Drawing.Imaging;
 using System.Text;
+using Azure;
+using Azure.AI.Vision.ImageAnalysis;
 
 namespace SpireSearchPDFCoordinates.Helpers
 {
@@ -14,6 +15,7 @@ namespace SpireSearchPDFCoordinates.Helpers
         private string _endpoint = "https://voce-data-computer-vision.cognitiveservices.azure.com/";
         private string uriBase = string.Empty;
         private static ComputerVisionClient _client;
+        private static ImageAnalysisClient _analysysClient;
 
         public AzureVisionAI()
         {
@@ -22,23 +24,18 @@ namespace SpireSearchPDFCoordinates.Helpers
             {
                 Endpoint = _endpoint
             };
+
+            _analysysClient = new ImageAnalysisClient(
+                new Uri(_endpoint),
+                new AzureKeyCredential(_subscriptionKey));
         }
-        public async Task<string> RunProcess(MemoryStream imageStream)
+        public async Task<string> RunProcess(Bitmap bitmap)
         {
             try
             {
-                // Read the image file into a byte array
-                //byte[] imageByteArray = File.ReadAllBytes(imageFilePath);
-
-                //await AnalyzeImage(client, imageFilePath);
-
-                string imageFilePath =
-                    @"C:\Users\carlo\source\repos\SpireSearchPDFCoordinates\Documents\DocumentImages\CropedPNG-img-0.png";
-                await ExtractTextFromImage(imageFilePath);
-
                 try
                 {
-                    var responseString = await ExtractTextFromImageStream(imageStream);
+                    var responseString = await ExtractTextFromImageStream(bitmap);
                     return responseString;
                 }
                 catch (Exception ex)
@@ -70,6 +67,21 @@ namespace SpireSearchPDFCoordinates.Helpers
                 //    Console.WriteLine(jsonResponse);
                 //}
                 #endregion
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error: {e.Message}");
+            }
+
+            return string.Empty;
+        }
+
+        public async Task<string> RunProcessUsingFilePath(string imageFilePath)
+        {
+            try
+            {
+                await ExtractTextFromImage(imageFilePath);
 
             }
             catch (Exception e)
@@ -163,42 +175,110 @@ namespace SpireSearchPDFCoordinates.Helpers
             }
         }
 
-        private async Task<string> ExtractTextFromImageStream(MemoryStream imageStream)
+        private async Task<string> ExtractTextFromImageStream(Bitmap bitmap)
         {
             string completeString = string.Empty;
 
             try
             {
-                var canReadImage = imageStream.CanRead;
-               
-                // Recognize text from the image
-                OcrResult ocrResult = await _client.RecognizePrintedTextInStreamAsync(true, imageStream);
 
-                // Process OCR result
-                if (ocrResult != null)
+                MemoryStream memStream = new MemoryStream();
+                bitmap.Save(memStream, ImageFormat.Png);
+                memStream.Position = 0;
+                byte[] imageData = memStream.ToArray();
+                BinaryData binaryData = BinaryData.FromBytes(imageData);
+
+
+                //var finalImagePath =
+                //    @"C:\Users\carlo\source\repos\SpireSearchPDFCoordinates\Documents\DocumentImages\" +
+                //    String.Format("{0}.png", Guid.NewGuid());
+                //MemoryStream memone = new MemoryStream();
+                //bitmap.Save(finalImagePath, ImageFormat.Png);
+                //bitmap.Save(memone, ImageFormat.Png);
+
+                //using (MemoryStream memStream = new MemoryStream())
+                //{;
+
+                //MemoryStream memStream = new MemoryStream(new System.Net.WebClient().DownloadData(finalImagePath));
+
+                ////Read the image from a path
+                //var imageBytes = File.ReadAllBytes(finalImagePath);
+                //MemoryStream imageStream = new MemoryStream(imageBytes);
+
+
+                #region Using Analyze Image
+
+                //using (FileStream fs = File.OpenRead(imageData))
+                //{
+                    //byte[] buffer = new byte[fs.Length];
+                    //int bytesRead = fs.Read(buffer, 0, buffer.Length);
+                    //BinaryData binaryData = BinaryData.FromBytes(buffer);
+
+                ImageAnalysisResult result = _analysysClient.Analyze(
+                    binaryData, VisualFeatures.Read);
+
+                foreach (var detectedTextBlock in result.Read.Blocks)
                 {
-                    string jsonResult = JsonConvert.SerializeObject(ocrResult, Formatting.Indented);
-
-                   
-                    Console.WriteLine("Extracted Text:");
-                    foreach (OcrRegion region in ocrResult.Regions)
+                    foreach (var lines in detectedTextBlock.Lines)
                     {
-                        foreach (OcrLine line in region.Lines)
-                        {
-                            foreach (OcrWord word in line.Words)
-                            {
-                                completeString += word.Text + " ";
-                                //Console.Write(word.Text + " ");
-                            }
-                            //Console.WriteLine();
-                        }
+                        completeString += lines.Text + " ";
                     }
                 }
-                else
-                {
-                    Console.WriteLine("No text recognized from the image.");
-                }
-                
+
+                //}
+
+                memStream.Dispose();
+
+                return completeString;
+                #endregion
+
+                #region old OCR
+                //OcrResult ocrResult = await _client.RecognizePrintedTextInStreamAsync(false, imageStream);
+
+                //    //MemoryStream memStream = new MemoryStream();
+                //    //bitmap.Save(memStream, ImageFormat.Png);
+                //    //memStream.Position = 0;
+
+
+
+                //    // Recognize text from the image
+                //    //OcrResult ocrResult = await _client.RecognizePrintedTextInStreamAsync(false, memStream);
+
+
+                //    //// Write the file
+                //    //var filePath = @"C:\Users\carlo\source\repos\SpireSearchPDFCoordinates\Documents\DocumentImages\finalImage101.png";
+                //    //using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                //    //{
+                //    //    memStream.CopyTo(fileStream);
+                //    //}
+
+                //    // Process OCR result
+                //    if (ocrResult != null)
+                //    {
+                //        string jsonResult = JsonConvert.SerializeObject(ocrResult, Formatting.Indented);
+
+
+                //        Console.WriteLine("Extracted Text:");
+                //        foreach (OcrRegion region in ocrResult.Regions)
+                //        {
+                //            foreach (OcrLine line in region.Lines)
+                //            {
+                //                foreach (OcrWord word in line.Words)
+                //                {
+                //                    completeString += word.Text + " ";
+                //                    Console.Write(word.Text + " ");
+                //                }
+                //                //Console.WriteLine();
+                //            }
+                //        }
+                //    }
+                //    else
+                //    {
+                //        Console.WriteLine("No text recognized from the image.");
+                //    }
+                ////}
+                #endregion
+
             }
             catch (Exception ex)
             {
@@ -207,5 +287,7 @@ namespace SpireSearchPDFCoordinates.Helpers
 
             return completeString;
         }
+
+
     }
 }

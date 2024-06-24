@@ -2,73 +2,137 @@
   {
     "Page": 0,
     "Name": "notice_improvement_value",
-    "X": 97.4211,
-    "Y": 305.86996,
-    "Height": 22.0,
-    "Width": 149.99991
+    "X": 74.4285,
+    "Y": 306.00098,
+    "Height": 20.291992,
+    "Width": 119.649506
   },
   {
     "Page": 0,
     "Name": "notice_land_value",
-    "X": 96.8955,
-    "Y": 365.25696,
-    "Height": 22.0,
-    "Width": 150.00049
+    "X": 109.756,
+    "Y": 369.05298,
+    "Height": 16.626984,
+    "Width": 114.541
   },
   {
     "Page": 0,
     "Name": "notice_improvement_value_hs",
-    "X": 97.0491,
-    "Y": 336.12497,
-    "Height": 22.0,
-    "Width": 149.9999
+    "X": 121.983,
+    "Y": 335.59897,
+    "Height": 20.326996,
+    "Width": 89.854004
   },
   {
     "Page": 0,
     "Name": "notice_total_notice_value",
-    "X": 94.7934,
-    "Y": 427.27197,
-    "Height": 22.0,
-    "Width": 149.9996
+    "X": 121.398,
+    "Y": 430.25397,
+    "Height": 18.144989,
+    "Width": 99.745
   },
   {
     "Page": 0,
     "Name": "current_improvement_value",
-    "X": 360.721,
+    "X": 405.812,
     "Y": 306.39496,
-    "Height": 22.0,
-    "Width": 150.0
+    "Height": 19.709015,
+    "Width": 104.909
   },
   {
     "Page": 0,
     "Name": "current_improvement_value_hs",
-    "X": 361.247,
+    "X": 406.92,
     "Y": 337.40298,
-    "Height": 22.0,
-    "Width": 150.0
+    "Height": 19.090973,
+    "Width": 104.326996
   },
   {
     "Page": 0,
     "Name": "current_land_value",
-    "X": 364.4,
+    "X": 407.164,
     "Y": 366.30798,
-    "Height": 22.0,
-    "Width": 150.00003
+    "Height": 20.835999,
+    "Width": 107.23602
   },
   {
     "Page": 0,
     "Name": "currentl_land_value_hs",
-    "X": 363.875,
+    "X": 407.439,
     "Y": 398.36597,
+    "Height": 19.164001,
+    "Width": 106.436005
+  },
+  {
+    "Page": 0,
+    "Name": "total_agreed_value",
+    "X": 408.083,
+    "Y": 429.37396,
+    "Height": 19.164001,
+    "Width": 103.164
+  },
+  {
+    "Page": 0,
+    "Name": "representative",
+    "X": 335.41,
+    "Y": 587.781,
     "Height": 22.0,
     "Width": 150.0
   },
   {
     "Page": 0,
-    "Name": "total_agreed_value",
-    "X": 361.247,
-    "Y": 429.37396,
+    "Name": "total_market_value",
+    "X": 369.446,
+    "Y": 455.99896,
     "Height": 22.0,
-    "Width": 150.0
+    "Width": 149.99997
+  },
+  {
+    "Page": 0,
+    "Name": "property_owner_comments",
+    "X": 35.629,
+    "Y": 479.99896,
+    "Height": 22.0,
+    "Width": 163.964
+  },
+  {
+    "Page": 0,
+    "Name": "legal_description",
+    "X": 357.665,
+    "Y": 115.63599,
+    "Height": 14.437012,
+    "Width": 206.14597
+  },
+  {
+    "Page": 1,
+    "Name": "legal_description_page2",
+    "X": 357.818,
+    "Y": 110.255005,
+    "Height": 16.471985,
+    "Width": 188.10901
+  },
+  {
+    "Page": 1,
+    "Name": "situs_address_page2",
+    "X": 343.273,
+    "Y": 126.255005,
+    "Height": 22.0,
+    "Width": 202.07196
+  },
+  {
+    "Page": 1,
+    "Name": "telephone_page2",
+    "X": 97.5258,
+    "Y": 92.265015,
+    "Height": 15.817993,
+    "Width": 70.8732
+  },
+  {
+    "Page": 1,
+    "Name": "tax_year_page2",
+    "X": 314.473,
+    "Y": 68.21802,
+    "Height": 12.836975,
+    "Width": 24.03601
   }
 ]
